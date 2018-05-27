@@ -1,5 +1,6 @@
 import React, { Component } from "react";
 import { Grid, Button } from "semantic-ui-react";
+import cuid from "cuid";
 import OrderList from "../OrderList/OrderList";
 import OrderForm from "../OrderForm/OrderForm";
 
@@ -72,6 +73,16 @@ class OrderDashboard extends Component {
     });
   };
 
+  handleCreateOrder = newOrder => {
+    newOrder.id = cuid();
+    newOrder.hostPhotoURL = "/assets/user.png";
+    const updatedOrders = [...this.state.orders, newOrder];
+    this.setState({
+      orders: updatedOrders,
+      isOpen: false
+    });
+  };
+
   render() {
     return (
       <Grid>
@@ -84,7 +95,12 @@ class OrderDashboard extends Component {
             positive
             content="Create Order"
           />
-          {this.state.isOpen && <OrderForm handleCancel={this.handleCancel} />}
+          {this.state.isOpen && (
+            <OrderForm
+              createOrder={this.handleCreateOrder}
+              handleCancel={this.handleCancel}
+            />
+          )}
         </Grid.Column>
       </Grid>
     );

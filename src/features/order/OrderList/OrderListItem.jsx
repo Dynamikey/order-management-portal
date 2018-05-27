@@ -31,7 +31,7 @@ class OrderListItem extends Component {
         </Segment>
         <Segment secondary>
           <List horizontal>
-          {order.participants.map((participant) => (
+          {order.participants && order.participants.map((participant) => (
             <OrderListParticipant key={participant.id} participant={participant}/>
           ))}
           </List>
