@@ -31,6 +31,7 @@ class NavBar extends Component {
             Order Management Portal
           </Menu.Item>
           <Menu.Item as={NavLink} to="/orders" name="Orders" />
+          <Menu.Item as={NavLink} to="/test" name="Test" />
           {authenticated && 
           <Menu.Item as={NavLink} to="/participants" name="Participants" />}
           {authenticated && <Menu.Item>

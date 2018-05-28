@@ -3,7 +3,7 @@ import React from "react";
 const HomePage = ({history}) => {
   return (
     <div>
-      <div className="ui inverted vertical masthead center aligned segment">
+      <div className="ui inverted vertical masthead center aligned segment" >
         <div className="ui text container">
           <h1 className="ui inverted stackable header">
             <img
