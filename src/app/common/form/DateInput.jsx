@@ -5,7 +5,7 @@ import "react-datepicker/dist/react-datepicker.css";
 import moment from "moment";
 
 const DateInput = ({
-  input: {value, onChange, ...restInput},
+  input: { value, onChange, ...restInput },
   width,
   placeholder,
   meta: { touched, error },

@@ -1,9 +1,9 @@
 import React from "react";
 
-const HomePage = ({history}) => {
+const HomePage = ({ history }) => {
   return (
     <div>
-      <div className="ui inverted vertical masthead center aligned segment" >
+      <div className="ui inverted vertical masthead center aligned segment">
         <div className="ui text container">
           <h1 className="ui inverted stackable header">
             <img
@@ -13,7 +13,11 @@ const HomePage = ({history}) => {
             />
             <div className="content">Order Management Portal</div>
           </h1>
-          <div onClick={() => history.push('/orders')} className="ui huge white inverted button">
+          <br />
+          <div
+            onClick={() => history.push("/orders")}
+            className="ui huge white inverted button"
+          >
             Get Started
             <i className="right arrow icon" />
           </div>
