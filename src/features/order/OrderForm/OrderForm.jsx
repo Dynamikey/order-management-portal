@@ -1,26 +1,32 @@
 import React, { Component } from "react";
 import { connect } from "react-redux";
+import { reduxForm, Field } from "redux-form";
+import moment from "moment";
+import {
+  composeValidators,
+  combineValidators,
+  isRequired,
+  hasLengthGreaterThan
+} from "revalidate";
 import cuid from "cuid";
-import { Segment, Form, Button } from "semantic-ui-react";
+import { Segment, Form, Button, Grid, Header } from "semantic-ui-react";
 import { createOrder, updateOrder } from "../orderActions";
+import TextInput from "../../../app/common/form/TextInput";
+import TextArea from "../../../app/common/form/TextArea";
+import SelectInput from "../../../app/common/form/SelectInput";
+import DateInput from "../../../app/common/form/DateInput";
 
 const mapState = (state, ownProps) => {
   const orderId = ownProps.match.params.id;
 
-  let order = {
-    title: "",
-    date: "",
-    city: "",
-    venue: "",
-    hostedBy: ""
-  };
+  let order = {};
 
   if (orderId && state.orders.length > 0) {
     order = state.orders.filter(order => order.id === orderId)[0];
   }
 
   return {
-    order
+    initialValues: order
   };
 };
 
@@ -29,97 +35,117 @@ const actions = {
   updateOrder
 };
 
-class OrderForm extends Component {
-  state = {
-    order: Object.assign({}, this.props.order)
-  };
+const category = [
+  { key: "drinks", text: "Drinks", value: "drinks" },
+  { key: "culture", text: "Culture", value: "culture" },
+  { key: "film", text: "Film", value: "film" },
+  { key: "food", text: "Food", value: "food" },
+  { key: "music", text: "Music", value: "music" },
+  { key: "travel", text: "Travel", value: "travel" }
+];
 
-  onFormSubmit = evt => {
-    evt.preventDefault();
-    if (this.state.order.id) {
-      this.props.updateOrder(this.state.order);
+const validate = combineValidators({
+  title: isRequired({ message: "The order number is required" }),
+  category: isRequired({ message: "Please provide a category" }),
+  description: composeValidators(
+    isRequired({ message: "Please enter a description" }),
+    hasLengthGreaterThan(4)({
+      message: "Description needs to be at least 5 characters"
+    })
+  )(),
+  city: isRequired("city"),
+  venue: isRequired("venue"),
+  date: isRequired("date")
+});
+
+class OrderForm extends Component {
+  onFormSubmit = values => {
+    values.date = moment(values.date).format();
+    if (this.props.initialValues.id) {
+      this.props.updateOrder(values);
       this.props.history.goBack();
     } else {
       const newOrder = {
-        ...this.state.order,
+        ...values,
         id: cuid(),
-        hostPhotoURL: "/assets/user.png"
+        hostPhotoURL: "/assets/user.png",
+        hostedBy: "Bob"
       };
       this.props.createOrder(newOrder);
       this.props.history.push("/orders");
     }
   };
 
-  onInputChange = evt => {
-    const newOrder = this.state.order;
-    newOrder[evt.target.name] = evt.target.value;
-    this.setState({
-      order: newOrder
-    });
-  };
-
   render() {
-    const { order } = this.state;
+    const { invalid, submitting, pristine } = this.props;
     return (
-      <div>
-        <Segment>
-          <Form onSubmit={this.onFormSubmit}>
-            <Form.Field>
-              <label>Order Title</label>
-              <input
+      <Grid>
+        <Grid.Column width={10}>
+          <Segment>
+            <Header sub color="teal" content="Order Details" />
+            <Form onSubmit={this.props.handleSubmit(this.onFormSubmit)}>
+              <Field
                 name="title"
-                onChange={this.onInputChange}
-                value={order.title}
-                placeholder="Order Title"
+                type="text"
+                component={TextInput}
+                placeholder="Give your order a number"
               />
-            </Form.Field>
-            <Form.Field>
-              <label>Event Date</label>
-              <input
-                name="date"
-                onChange={this.onInputChange}
-                value={order.date}
-                type="date"
-                placeholder="Event Date"
+              <Field
+                name="category"
+                type="text"
+                component={SelectInput}
+                options={category}
+                placeholder="What is your order about"
               />
-            </Form.Field>
-            <Form.Field>
-              <label>City</label>
-              <input
+              <Field
+                name="description"
+                type="text"
+                rows={3}
+                component={TextArea}
+                placeholder="Tell us about your order"
+              />
+              <Header sub color="teal" content="Delivery Location Details" />
+              <Field
                 name="city"
-                onChange={this.onInputChange}
-                value={order.city}
-                placeholder="City event is taking place"
+                type="text"
+                component={TextInput}
+                placeholder="Delivery city"
               />
-            </Form.Field>
-            <Form.Field>
-              <label>Venue</label>
-              <input
+              <Field
                 name="venue"
-                onChange={this.onInputChange}
-                value={order.venue}
-                placeholder="Enter the Venue of the event"
+                type="text"
+                component={TextInput}
+                placeholder="Delivery address"
               />
-            </Form.Field>
-            <Form.Field>
-              <label>Hosted By</label>
-              <input
-                name="hostedBy"
-                onChange={this.onInputChange}
-                value={order.hostedBy}
-                placeholder="Enter the name of person hosting"
+              <Field
+                name="date"
+                type="text"
+                component={DateInput}
+                dateFormat="YYYY-MM-DD HH:mm"
+                timeFormat="HH:mm"
+                showTimeSelect
+                placeholder="Delivery date and time"
               />
-            </Form.Field>
-            <Button positive type="submit">
-              Submit
-            </Button>
-            <Button onClick={this.props.history.goBack} type="button">
-              Cancel
-            </Button>
-          </Form>
-        </Segment>
-      </div>
+
+              <Button
+                disabled={invalid || submitting || pristine}
+                positive
+                type="submit"
+              >
+                Submit
+              </Button>
+              <Button onClick={this.props.history.goBack} type="button">
+                Cancel
+              </Button>
+            </Form>
+          </Segment>
+        </Grid.Column>
+      </Grid>
     );
   }
 }
-export default connect(mapState, actions)(OrderForm);
+export default connect(mapState, actions)(
+  reduxForm({ form: "orderForm", enableReinitialize: true, validate })(
+    OrderForm
+  )
+);
