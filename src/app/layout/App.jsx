@@ -1,16 +1,39 @@
 import React, { Component } from "react";
 import { Container } from "semantic-ui-react";
+import { Route, Switch } from "react-router-dom";
 import OrderDashboard from "../../features/order/OrderDashboard/OrderDashboard";
 import NavBar from "../../features/nav/NavBar/NavBar";
-
+import OrderDetailedPage from "../../features/order/OrderDetailed/OrderDetailedPage";
+import ParticipantDashboard from "../../features/participant/ParticipantDashboard/ParticipantDashboard";
+import ParticipantDetailedPage from "../../features/participant/ParticipantDetailed/ParticipantDetailedPage";
+import SettingsDashboard from "../../features/participant/Settings/SettingsDashboard";
+import OrderForm from "../../features/order/OrderForm/OrderForm";
+import HomePage from "../../features/home/HomePage";
 class App extends Component {
   render() {
     return (
       <div>
-        <NavBar />
-        <Container className="main">
-          <OrderDashboard />
-        </Container>
+        <Switch>
+          <Route exact path="/" component={HomePage} />
+        </Switch>
+        <Route
+          path="/(.+)"
+          render={() => (
+            <div>
+              <NavBar />
+              <Container className="main">
+                <Switch>
+                  <Route path="/orders" component={OrderDashboard} />
+                  <Route path="/order/:id" component={OrderDetailedPage} />
+                  <Route path="/participants" component={ParticipantDashboard} />
+                  <Route path="/profile/:id" component={ParticipantDetailedPage} />
+                  <Route path="/settings" component={SettingsDashboard} />
+                  <Route path="/createOrder" component={OrderForm} />
+                </Switch>
+              </Container>
+            </div>
+          )}
+        />
       </div>
     );
   }
