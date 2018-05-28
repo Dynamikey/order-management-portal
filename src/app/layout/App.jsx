@@ -9,7 +9,8 @@ import ParticipantDetailedPage from "../../features/participant/ParticipantDetai
 import SettingsDashboard from "../../features/participant/Settings/SettingsDashboard";
 import OrderForm from "../../features/order/OrderForm/OrderForm";
 import HomePage from "../../features/home/HomePage";
-import TestComponent from '../../features/testarea/TestComponent'
+import TestComponent from "../../features/testarea/TestComponent";
+
 class App extends Component {
   render() {
     return (
@@ -17,6 +18,7 @@ class App extends Component {
         <Switch>
           <Route exact path="/" component={HomePage} />
         </Switch>
+
         <Route
           path="/(.+)"
           render={() => (
@@ -27,8 +29,15 @@ class App extends Component {
                   <Route path="/orders" component={OrderDashboard} />
                   <Route path="/test" component={TestComponent} />
                   <Route path="/order/:id" component={OrderDetailedPage} />
-                  <Route path="/participants" component={ParticipantDashboard} />
-                  <Route path="/profile/:id" component={ParticipantDetailedPage} />
+                  <Route path="/manage/:id" component={OrderForm} />
+                  <Route
+                    path="/participants"
+                    component={ParticipantDashboard}
+                  />
+                  <Route
+                    path="/profile/:id"
+                    component={ParticipantDetailedPage}
+                  />
                   <Route path="/settings" component={SettingsDashboard} />
                   <Route path="/createOrder" component={OrderForm} />
                 </Switch>
