@@ -3,7 +3,7 @@ import { Segment, Item, Icon, List, Button } from 'semantic-ui-react'
 import OrderListParticipant from './OrderListParticipant'
 class OrderListItem extends Component {
   render() {
-    const {order} = this.props;
+    const {order, onOrderOpen, deleteOrder} = this.props;
     return (
       <Segment.Group>
         <Segment>
@@ -38,7 +38,8 @@ class OrderListItem extends Component {
         </Segment>
         <Segment clearing>
         <span>{order.description}</span>
-          <Button as="a" color="teal" floated="right" content="View" />
+          <Button onClick={deleteOrder(order.id)} as="a" color="red" floated="right" content="Delete" />
+          <Button onClick={onOrderOpen(order)} as="a" color="teal" floated="right" content="View" />
         </Segment>
       </Segment.Group>
     );

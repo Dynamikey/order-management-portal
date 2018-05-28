@@ -1,19 +1,42 @@
 import React, { Component } from "react";
 import { Segment, Form, Button } from "semantic-ui-react";
 
+const emptyOrder = {
+    title: '',
+    date: '',
+    city: '',
+    venue: '',
+    hostedBy: ''
+}
+
 class OrderForm extends Component {
   state = {
-    order: {
-        title: '',
-        date: '',
-        city: '',
-        venue: '',
-        hostedBy: '',
-    }
+    order: emptyOrder
   }
+  
+  componentDidMount() {
+      if (this.props.selectedOrder !== null) {
+          this.setState({
+              order: this.props.selectedOrder
+          })
+      }
+  }
+
+  componentWillReceiveProps(nextProps) {
+      if (nextProps.selectedOrder !== this.props.selectedOrder) {
+          this.setState({
+              order: nextProps.selectedOrder || emptyOrder
+          })
+      }
+  }
+
   onFormSubmit = (evt) => {
     evt.preventDefault();
-    this.props.createOrder(this.state.order);
+    if (this.state.order.id) {
+        this.props.updateOrder(this.state.order);
+    } else {
+        this.props.createOrder(this.state.order);
+    }
   }
 
 

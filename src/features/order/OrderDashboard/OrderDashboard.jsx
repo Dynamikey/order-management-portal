@@ -8,7 +8,7 @@ const orders = [
   {
     id: "1",
     title: "Trip to Tower of London",
-    date: "2018-03-27T11:00:00+00:00",
+    date: "2018-03-27",
     category: "culture",
     description:
       "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Phasellus sollicitudin ligula eu leo tincidunt, quis scelerisque magna dapibus. Sed eget ipsum vel arcu vehicula ullamcorper.",
@@ -32,7 +32,7 @@ const orders = [
   {
     id: "2",
     title: "Trip to Punch and Judy Pub",
-    date: "2018-03-28T14:00:00+00:00",
+    date: "2018-03-28",
     category: "drinks",
     description:
       "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Phasellus sollicitudin ligula eu leo tincidunt, quis scelerisque magna dapibus. Sed eget ipsum vel arcu vehicula ullamcorper.",
@@ -58,11 +58,13 @@ const orders = [
 class OrderDashboard extends Component {
   state = {
     orders: orders,
-    isOpen: false
+    isOpen: false,
+    selectedOrder: null
   };
 
   handleFormOpen = () => {
     this.setState({
+      selectedOrder: null,
       isOpen: true
     });
   };
@@ -72,6 +74,27 @@ class OrderDashboard extends Component {
       isOpen: false
     });
   };
+
+  handleUpdateOrder = (updatedOrder) => {
+    this.setState({
+      orders: this.state.orders.map(order => {
+        if (order.id === updatedOrder.id) {
+          return Object.assign({}, updatedOrder);
+        } else {
+          return order
+        }
+      }),
+      isOpen: false,
+      selectedOrder: null
+    })
+  }
+
+  handleOpenOrder = (orderToOpen) => () => {
+    this.setState({
+      selectedOrder: orderToOpen,
+      isOpen: true
+    })
+  }
 
   handleCreateOrder = newOrder => {
     newOrder.id = cuid();
@@ -83,11 +106,19 @@ class OrderDashboard extends Component {
     });
   };
 
+  handleDeleteOrder = (orderID) => () => {
+    const updatedOrders = this.state.orders.filter(order => order.id !== orderID);
+      this.setState({
+        orders: updatedOrders
+      })
+  }
+
   render() {
+    const {selectedOrder} = this.state;
     return (
       <Grid>
         <Grid.Column width={10}>
-          <OrderList orders={this.state.orders} />
+          <OrderList deleteOrder={this.handleDeleteOrder} onOrderOpen={this.handleOpenOrder} orders={this.state.orders} />
         </Grid.Column>
         <Grid.Column width={6}>
           <Button
@@ -96,7 +127,8 @@ class OrderDashboard extends Component {
             content="Create Order"
           />
           {this.state.isOpen && (
-            <OrderForm
+            <OrderForm updateOrder={this.handleUpdateOrder} 
+              selectedOrder={selectedOrder}
               createOrder={this.handleCreateOrder}
               handleCancel={this.handleCancel}
             />
