@@ -1,28 +1,39 @@
 import React, { Component } from "react";
+import { connect } from "react-redux";
 import { Menu, Container, Button } from "semantic-ui-react";
 import { NavLink, Link, withRouter } from "react-router-dom";
 import SignedOutMenu from "../Menus/SignedOutMenu";
 import SignedInMenu from "../Menus/SignedInMenu";
+import { openModal } from "../../modals/modalActions";
+import { logout } from '../../auth/authActions'
+
+const actions = {
+  openModal,
+  logout
+};
+
+const mapState = (state) => ({
+  auth: state.auth
+})
+
 class NavBar extends Component {
-  state = {
-    authenticated: false
-  };
 
   handleSignIn = () => {
-    this.setState({
-      authenticated: true
-    });
+    this.props.openModal("LoginModal");
+  };
+
+  handleRegister = () => {
+    this.props.openModal("RegisterModal");
   };
 
   handleSignOut = () => {
-    this.setState({
-      authenticated: false
-    });
-    this.props.history.push('/')
+    this.props.logout();
+    this.props.history.push("/");
   };
 
   render() {
-    const { authenticated } = this.state;
+    const { auth } = this.props;
+    const authenticated = auth.authenticated;
     return (
       <Menu inverted fixed="top">
         <Container>
@@ -32,26 +43,29 @@ class NavBar extends Component {
           </Menu.Item>
           <Menu.Item as={NavLink} to="/orders" name="Orders" />
           <Menu.Item as={NavLink} to="/test" name="Test" />
-          {authenticated && 
-          <Menu.Item as={NavLink} to="/participants" name="Participants" />}
-          {authenticated && <Menu.Item>
-            <Button
-              as={Link}
-              to="/createOrder"
-              floated="right"
-              positive
-              inverted
-              content="Create Order"
-            />
-          </Menu.Item>}
+          {authenticated && (
+            <Menu.Item as={NavLink} to="/participants" name="Participants" />
+          )}
+          {authenticated && (
+            <Menu.Item>
+              <Button
+                as={Link}
+                to="/createOrder"
+                floated="right"
+                positive
+                inverted
+                content="Create Order"
+              />
+            </Menu.Item>
+          )}
           {authenticated ? (
-            <SignedInMenu signOut={this.handleSignOut} />
+            <SignedInMenu currentUser={auth.currentUser} signOut={this.handleSignOut} />
           ) : (
-            <SignedOutMenu signIn={this.handleSignIn} />
+            <SignedOutMenu signIn={this.handleSignIn} register={this.handleRegister} />
           )}
         </Container>
       </Menu>
     );
   }
 }
-export default withRouter(NavBar);
+export default withRouter(connect(mapState, actions)(NavBar));
